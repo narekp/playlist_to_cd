@@ -15,6 +15,7 @@ import queue
 import json
 from urllib.parse import urlparse
 from core.artists import split_artists, get_duration_ms, make_track_key
+from sources.csv_source import load_tracks_from_csv
 from core.naming import safe_name, format_artists_for_filename
 from core.query import build_query_variants
 from core.ffmpeg_utils import (
@@ -338,31 +339,19 @@ class App:
                 with open(state_file, 'r') as f:
                     downloaded_set = set(json.load(f))
 
-            tracks = []
-            with open(csv_path, newline="", encoding="utf-8") as f:
-                reader = csv.DictReader(f)
-                tracks = list(reader)
+            valid_tracks, invalid_rows_list = load_tracks_from_csv(csv_path)
+            invalid_rows = len(invalid_rows_list)
 
-            total = len(tracks)
             accepted = 0
             rejected = 0
             failed = 0
             skipped = 0
-            invalid_rows = 0
             total_duration_sec = 0.0
             accepted_duration_sec = 0.0
 
             # Build average from known durations only (excluding invalid rows)
             known_duration_secs = []
-            valid_tracks = []
-            for row in tracks:
-                track_name = (row.get("Track Name", "") or "").strip()
-                artist_name = (row.get("Artist Name(s)", "") or "").strip()
-                if not track_name and not artist_name:
-                    invalid_rows += 1
-                    # Log and write to a separate file later
-                    continue
-                valid_tracks.append(row)
+            for row in valid_tracks:
                 duration_str = get_duration_ms(row)
                 try:
                     duration_val = int(duration_str)
@@ -379,17 +368,15 @@ class App:
             # Write invalid rows to a separate CSV
             if invalid_rows > 0:
                 invalid_file = os.path.join(processed_dir, "invalid_input_rows.csv")
+                all_rows = valid_tracks + invalid_rows_list
+                fieldnames = list(all_rows[0].keys()) if all_rows else []
                 with open(invalid_file, 'w', newline='', encoding='utf-8') as f:
-                    writer = csv.DictWriter(f, fieldnames=tracks[0].keys() if tracks else [])
+                    writer = csv.DictWriter(f, fieldnames=fieldnames)
                     writer.writeheader()
-                    for row in tracks:
-                        track_name = (row.get("Track Name", "") or "").strip()
-                        artist_name = (row.get("Artist Name(s)", "") or "").strip()
-                        if not track_name and not artist_name:
-                            writer.writerow(row)
-                            self.log_queue.put(f"[SKIP-INVALID-ROW] Missing track/artist – see {invalid_file}")
+                    for row in invalid_rows_list:
+                        writer.writerow(row)
+                        self.log_queue.put(f"[SKIP-INVALID-ROW] Missing track/artist – see {invalid_file}")
 
-            # Use valid_tracks for the rest of processing
             tracks = valid_tracks
             total_valid = len(tracks)
 
