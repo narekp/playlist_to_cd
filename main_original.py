@@ -204,8 +204,15 @@ def _format_missing_deps_message(missing):
 class App:
     def __init__(self, root):
         self.root = root
-        root.title("Media Batch Processor MVP")
-        root.geometry("600x400")
+        root.title("Spotify Playlist to Disk Converter")
+        width, height = 700, 550
+        root.geometry(f"{width}x{height}")
+        root.update_idletasks()
+        sw = root.winfo_screenwidth()
+        sh = root.winfo_screenheight()
+        x = (sw - width) // 2
+        y = (sh - height) // 2
+        root.geometry(f"{width}x{height}+{x}+{y}")
 
         ok, missing = check_dependencies()
         if not ok:
@@ -215,7 +222,6 @@ class App:
         tk.Label(root, text="Playlist URL:").pack(pady=5)
         self.url_entry = tk.Entry(root, width=50)
         self.url_entry.pack()
-
         tk.Button(root, text="Open Exportify for CSV", command=self.open_exportify).pack(pady=5)
 
         tk.Label(root, text="CSV File:").pack(pady=5)
@@ -226,6 +232,7 @@ class App:
         tk.Label(root, text="Output Folder:").pack(pady=5)
         self.out_entry = tk.Entry(root, width=50)
         self.out_entry.pack()
+        tk.Button(root, text="Browse Folder", command=self.browse_folder).pack(pady=5)
 
         tk.Label(root, text="Output Mode:").pack(pady=5)
         self.mode_var = tk.StringVar(value="mp3")
@@ -233,8 +240,6 @@ class App:
         mode_frame.pack()
         tk.Radiobutton(mode_frame, text="MP3 CD", variable=self.mode_var, value="mp3").pack(side=tk.LEFT)
         tk.Radiobutton(mode_frame, text="Audio CD", variable=self.mode_var, value="audio").pack(side=tk.LEFT)
-
-        tk.Button(root, text="Browse Folder", command=self.browse_folder).pack(pady=5)
 
         self.start_btn = tk.Button(root, text="Start", command=self.start_process)
         self.start_btn.pack(pady=5)
@@ -280,13 +285,16 @@ class App:
             self.log_queue.put("Opened Exportify—export CSV and select below.")
 
     def browse_csv(self):
-        path = filedialog.askopenfilename(filetypes=[("CSV Files", "*.csv")])
+        path = filedialog.askopenfilename(
+            filetypes=[("CSV Files", "*.csv")],
+            initialdir=os.path.expanduser("~/Desktop"),
+        )
         if path:
             self.csv_entry.delete(0, tk.END)
             self.csv_entry.insert(0, path)
 
     def browse_folder(self):
-        path = filedialog.askdirectory()
+        path = filedialog.askdirectory(initialdir=os.path.expanduser("~/Desktop"))
         if path:
             self.out_entry.delete(0, tk.END)
             self.out_entry.insert(0, path)

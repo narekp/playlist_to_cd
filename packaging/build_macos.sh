@@ -37,4 +37,4 @@ fi
 pyinstaller --noconfirm --clean "$SPEC_FILE"
 
 echo ""
-echo "Build complete. App: $PROJECT_ROOT/dist/playlist_to_cd.app"
+echo "Build complete. App: $PROJECT_ROOT/dist/Spotify Playlist to Disk Converter.app"
