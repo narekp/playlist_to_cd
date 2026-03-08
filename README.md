@@ -1,6 +1,6 @@
 # playlist_to_cd
 
-A tool that converts Spotify playlist CSVs (exported via [Exportify](https://exportify.net/)) into CD-ready output: either an **MP3 CD** (~700 MB, bitrate-fitted) or an **Audio CD** (44.1 kHz / 16-bit stereo WAV).
+`playlist_to_cd` is a small macOS desktop utility that turns Spotify playlist CSV exports into CD-ready output: either an **MP3 CD** (~700 MB, bitrate-fitted) or an **Audio CD** (44.1 kHz / 16-bit stereo WAV).
 
 ## What problem it solves
 
@@ -12,21 +12,31 @@ There are two entry points:
 
 | Entry point | Interface | Scope |
 |---|---|---|
-| `main_original.py` | Tkinter GUI | Full workflow: CSV parsing, YouTube download via yt-dlp, duration validation, post-processing (MP3 CD or Audio CD) |
+| `main_original.py` | Tkinter GUI desktop app | Full workflow: CSV parsing, YouTube download via yt-dlp, duration validation, post-processing (MP3 CD or Audio CD) |
 | `main.py` | CLI | Post-processing only: takes an existing directory of MP3 files and runs the MP3 CD or Audio CD pipeline |
 
-The core logic (artist parsing, filename safety, search query building, ffmpeg operations) has been extracted into reusable modules under `core/` and `modes/`.
+The core logic (artist parsing, filename safety, search query building, ffmpeg operations) lives in reusable modules under `core/` and `modes/`.
+
+## Recommended path
+
+The supported product path is:
+
+1. Export the Spotify playlist to CSV with [Exportify](https://exportify.net/).
+2. Open the Tkinter desktop app.
+3. Choose the CSV, choose an output folder, select MP3 CD or Audio CD, and run.
+
+That CSV-first flow is the one this project is actively optimized around.
 
 ## Current limitations
 
-- `main.py` cannot drive the full CSV-to-CD workflow; download/acquisition is only available through the legacy monolith (`main_original.py`).
+- `main.py` cannot drive the full CSV-to-CD workflow; download/acquisition is only available through the desktop app (`main_original.py`).
 - `core/query.py` (search query building) is extracted but only called from the monolith; it is not yet wired into `main.py`.
-- No headless or server mode exists.
+- No web app, server mode, or headless full-workflow entry point exists.
 - Requires `ffmpeg`, `ffprobe`, and `yt-dlp` installed and available on `PATH`.
 
 ## Current workflow
 
-### Full workflow (GUI)
+### Full workflow (desktop app)
 
 1. Export a Spotify playlist to CSV via Exportify.
 2. Run `python main_original.py`.
@@ -64,11 +74,18 @@ python main.py --mode mp3 --processed-dir ./my_tracks --accepted-duration-sec 36
 python main.py --mode audio --processed-dir ./my_tracks
 ```
 
-## Where it is heading
+## Why the project is CSV-first
 
-Near-term goals focus on extracting the remaining monolith logic (download orchestration, CSV parsing, state management) into the modular path so `main.py` can drive the full workflow without the GUI.
+An experimental branch, `feat/spotify-source`, explored a direct Spotify-connected route by adding `spotipy` plus local environment and callback configuration.
 
-A possible longer-term direction is replacing the Tkinter GUI with a web interface, but no code exists for that yet and no decisions have been made.
+That route is not the chosen product direction for this app:
+
+- It adds Spotify app registration, local callback setup, and per-user credential/config management.
+- It creates more account/auth friction for a simple local utility.
+- It is a worse fit for a packaged desktop app than a plain CSV import flow.
+- It still does not remove the downstream dependency on `yt-dlp`/YouTube matching for acquisition.
+
+The decision is to keep the app centered on a simple user-owned workflow: export the playlist to CSV, then feed that CSV back into the desktop app. That path is more practical, easier to support, and avoids tying normal use to Spotify-specific auth requirements.
 
 ## How to run
 
@@ -88,11 +105,11 @@ pip install -r requirements.txt
 
 ## How to run tests
 
-```
+```bash
 pytest
 ```
 
-Test configuration lives in `pyproject.toml`. The suite contains 70 test functions across 7 test files, covering all extracted modules (`core/` and `modes/`). Tests mock external boundaries (ffmpeg, ffprobe, subprocess, filesystem) and do not require network access.
+Test configuration lives in `pyproject.toml`. The suite currently includes 83 tests, including coverage for the extracted modules plus a minimal GUI smoke test. Tests mock external boundaries (ffmpeg, ffprobe, subprocess, filesystem) and do not require network access.
 
 ## Building the macOS app
 
@@ -105,6 +122,10 @@ To package the GUI as a standalone macOS `.app`:
    ./packaging/build_macos.sh
    ```
 
-3. **Output:** `dist/playlist_to_cd.app` — double-click or `open dist/playlist_to_cd.app` to run.
+3. **Output:** `dist/Spotify Playlist to Disk Converter.app` — double-click it or run:
+
+   ```bash
+   open "dist/Spotify Playlist to Disk Converter.app"
+   ```
 
 The build script uses the project `.venv` if it exists and has PyInstaller installed.

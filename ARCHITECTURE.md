@@ -44,11 +44,23 @@ main_original.py ─────┬──> core/artists.py
 
 ## main_original.py vs main.py
 
-**`main_original.py`** is the original monolith. It is a Tkinter GUI application that handles the entire workflow: CSV parsing, YouTube search/download via yt-dlp, duration validation, resume state (`state.json`), report generation (downloaded/failed/rejected CSVs), and post-processing through the `modes/` pipelines. It remains the only way to run the full CSV-to-CD workflow.
+**`main_original.py`** is the original monolith. It is the Tkinter desktop application that handles the entire workflow: CSV parsing, YouTube search/download via yt-dlp, duration validation, resume state (`state.json`), report generation (downloaded/failed/rejected CSVs), and post-processing through the `modes/` pipelines. It remains the only supported way to run the full CSV-to-CD workflow.
 
 **`main.py`** is a refactored CLI entry point that handles post-processing only. Given a directory of already-downloaded MP3 files, it runs either the MP3 CD or Audio CD pipeline. It does not handle downloading, CSV parsing, or state management.
 
 The monolith is intentionally preserved as the working source of truth. It is not dead code -- it is the only complete path through the system.
+
+## Input model decision
+
+The project currently standardizes on a CSV-first input model:
+
+1. Export playlist data with Exportify.
+2. Load that CSV into the desktop app.
+3. Let the app handle lookup, download, validation, and output generation.
+
+An experimental branch, `feat/spotify-source`, explored direct Spotify-connected input by adding `spotipy` and local auth/config requirements. That route was not adopted because it introduces Spotify app registration, callback/env setup, and user-account friction into a packaged local utility while still leaving the later YouTube/`yt-dlp` acquisition path in place.
+
+For this architecture, CSV import is the simpler and more supportable boundary.
 
 ## core/ responsibilities
 
