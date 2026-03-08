@@ -204,7 +204,8 @@ def _format_missing_deps_message(missing):
 class App:
     def __init__(self, root):
         self.root = root
-        root.title("Spotify Playlist to Disk Converter")
+        root.title("Playlist to CD")
+        root.minsize(500, 400)
         width, height = 700, 550
         root.geometry(f"{width}x{height}")
         root.update_idletasks()
@@ -219,38 +220,54 @@ class App:
             messagebox.showerror("Error", _format_missing_deps_message(missing))
             sys.exit(1)
 
-        tk.Label(root, text="Playlist URL:").pack(pady=5)
-        self.url_entry = tk.Entry(root, width=50)
-        self.url_entry.pack()
-        tk.Button(root, text="Open Exportify for CSV", command=self.open_exportify).pack(pady=5)
+        main_frame = tk.Frame(root, padx=12, pady=10)
+        main_frame.pack(fill=tk.X)
 
-        tk.Label(root, text="CSV File:").pack(pady=5)
-        self.csv_entry = tk.Entry(root, width=50)
-        self.csv_entry.pack()
-        tk.Button(root, text="Browse CSV", command=self.browse_csv).pack(pady=5)
+        # Source: Playlist URL + CSV file
+        source_frame = tk.Frame(main_frame)
+        source_frame.pack(fill=tk.X, pady=(0, 12))
+        tk.Label(source_frame, text="Playlist URL:").pack(pady=4)
+        self.url_entry = tk.Entry(source_frame, width=50)
+        self.url_entry.pack(pady=4)
+        tk.Button(source_frame, text="Open Exportify for CSV", command=self.open_exportify).pack(pady=4)
+        tk.Label(source_frame, text="CSV File:").pack(pady=4)
+        self.csv_entry = tk.Entry(source_frame, width=50)
+        self.csv_entry.pack(pady=4)
+        tk.Button(source_frame, text="Browse CSV", command=self.browse_csv).pack(pady=4)
 
-        tk.Label(root, text="Output Folder:").pack(pady=5)
-        self.out_entry = tk.Entry(root, width=50)
-        self.out_entry.pack()
-        tk.Button(root, text="Browse Folder", command=self.browse_folder).pack(pady=5)
+        # Destination: Output folder
+        dest_frame = tk.Frame(main_frame)
+        dest_frame.pack(fill=tk.X, pady=(0, 12))
+        tk.Label(dest_frame, text="Output Folder:").pack(pady=4)
+        self.out_entry = tk.Entry(dest_frame, width=50)
+        self.out_entry.pack(pady=4)
+        tk.Button(dest_frame, text="Browse Folder", command=self.browse_folder).pack(pady=4)
 
-        tk.Label(root, text="Output Mode:").pack(pady=5)
+        # Mode and actions
+        mode_actions_frame = tk.Frame(main_frame)
+        mode_actions_frame.pack(fill=tk.X, pady=(0, 12))
+        tk.Label(mode_actions_frame, text="Output Mode:").pack(pady=4)
         self.mode_var = tk.StringVar(value="mp3")
-        mode_frame = tk.Frame(root)
-        mode_frame.pack()
+        mode_frame = tk.Frame(mode_actions_frame)
+        mode_frame.pack(pady=4)
         tk.Radiobutton(mode_frame, text="MP3 CD", variable=self.mode_var, value="mp3").pack(side=tk.LEFT)
         tk.Radiobutton(mode_frame, text="Audio CD", variable=self.mode_var, value="audio").pack(side=tk.LEFT)
+        self.start_btn = tk.Button(mode_actions_frame, text="Start", command=self.start_process)
+        self.start_btn.pack(pady=4)
+        self.stop_btn = tk.Button(mode_actions_frame, text="Stop", command=self.stop_process, state='disabled')
+        self.stop_btn.pack(pady=4)
 
-        self.start_btn = tk.Button(root, text="Start", command=self.start_process)
-        self.start_btn.pack(pady=5)
-        self.stop_btn = tk.Button(root, text="Stop New Tasks", command=self.stop_process, state='disabled')
-        self.stop_btn.pack(pady=5)
+        # Progress
+        progress_frame = tk.Frame(main_frame)
+        progress_frame.pack(fill=tk.X, pady=(0, 10))
+        self.progress = ttk.Progressbar(progress_frame, length=400, mode='determinate')
+        self.progress.pack(pady=4)
 
-        self.progress = ttk.Progressbar(root, length=400, mode='determinate')
-        self.progress.pack(pady=5)
-
-        self.log = scrolledtext.ScrolledText(root, height=10)
-        self.log.pack(pady=5)
+        # Log area (expands on resize)
+        log_frame = tk.Frame(root)
+        log_frame.pack(fill=tk.BOTH, expand=True, padx=12, pady=(0, 10))
+        self.log = scrolledtext.ScrolledText(log_frame, height=10)
+        self.log.pack(fill=tk.BOTH, expand=True)
 
         self.log_queue = queue.Queue()
         self.stop_flag = threading.Event()

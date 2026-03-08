@@ -20,3 +20,5 @@ def test_app_initializes_without_crash(monkeypatch):
     assert app.csv_entry is not None
     assert app.out_entry is not None
     assert app.mode_var is not None
+    assert app.log is not None
+    assert root.title() == "Playlist to CD"
