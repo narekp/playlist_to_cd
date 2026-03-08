@@ -3,17 +3,18 @@ description: Git workflow safety for this repository
 alwaysApply: true
 ---
 
-- Do not commit directly to `main`.
-- Do not push directly to `main`.
-- For any meaningful code, test, or documentation change, work on a short-lived branch first.
-- Before making changes, state the intended branch name.
-- If currently on `main`, create and switch to a new branch before editing files.
-- Prefer branch names like:
+- Never work directly on `main`.
+- Before making any code, test, documentation, or configuration changes, first check the current git branch.
+- If the current branch is `main`, stop and instruct the user to create or switch to a working branch before editing files.
+- Prefer short-lived branches using these prefixes:
   - `feat/...`
   - `fix/...`
   - `test/...`
   - `docs/...`
   - `chore/...`
-- After changes, recommend the smallest relevant test command first.
-- Do not merge branches automatically unless explicitly asked.
+- If a task requires changes and the current branch is `main`, propose an appropriate branch name before proceeding.
+- Do not commit directly to `main`.
+- Do not push directly to `main`.
+- Do not merge branches automatically unless explicitly asked by the user.
 - Do not delete branches automatically unless explicitly asked.
+- After making changes, recommend the smallest relevant test command first (for example `pytest -q` or a specific test file).
