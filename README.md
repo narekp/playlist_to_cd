@@ -46,6 +46,24 @@ python main.py --mode mp3 --processed-dir /path/to/mp3s --accepted-duration-sec 
 python main.py --mode audio --processed-dir /path/to/mp3s
 ```
 
+## Example workflow
+
+**Full workflow (GUI):**
+
+1. Export your playlist from [Exportify](https://exportify.net/) and save as CSV.
+2. Run `python main_original.py`, choose the CSV and an output folder, pick "MP3 CD" or "Audio CD", then Start.
+3. When finished, burn the output folder to disc (for Audio CD, burn the `audio_cd_ready/` subfolder).
+
+**Post-processing only (CLI):**
+
+```bash
+# Folder of MP3s → MP3 CD (~700 MB). Example: 1 hour of accepted audio.
+python main.py --mode mp3 --processed-dir ./my_tracks --accepted-duration-sec 3600
+
+# Same folder → Audio CD WAVs
+python main.py --mode audio --processed-dir ./my_tracks
+```
+
 ## Where it is heading
 
 Near-term goals focus on extracting the remaining monolith logic (download orchestration, CSV parsing, state management) into the modular path so `main.py` can drive the full workflow without the GUI.
