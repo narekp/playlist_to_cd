@@ -8,6 +8,7 @@ playlist_to_cd/
 ├── main_original.py        # Legacy monolith (full GUI workflow)
 ├── core/
 │   ├── artists.py          # Artist parsing, track keys, duration extraction
+│   ├── constants.py        # Shared operational values for MP3 CD and Audio CD processing
 │   ├── naming.py           # Safe filenames, artist formatting
 │   ├── query.py            # YouTube search query variant building
 │   └── ffmpeg_utils.py     # ffmpeg/ffprobe wrappers (convert, metadata, renumber, verify)
@@ -52,14 +53,15 @@ The monolith is intentionally preserved as the working source of truth. It is no
 ## core/ responsibilities
 
 - **`artists.py`** -- Parses artist fields from Exportify CSV rows. Handles semicolon- and comma-separated artist lists. Provides `make_track_key` for deduplication and `get_duration_ms` for extracting duration from various CSV column name variants (including BOM-prefixed).
+- **`constants.py`** -- Centralizes shared operational values used by the extracted post-processing path, including the MP3 CD size target, bitrate ladder, and Audio CD conversion defaults.
 - **`naming.py`** -- Produces filesystem-safe names (`safe_name`) and formats artist strings for filenames vs. metadata (metadata truncates to first two artists).
 - **`query.py`** -- Builds an ordered list of YouTube search query variants from artist + track name, progressively simplifying (remove parentheticals, quotes) as fallbacks.
 - **`ffmpeg_utils.py`** -- Wraps ffmpeg and ffprobe for: duration verification, total size calculation, required bitrate estimation, bitrate conversion, metadata tagging from filename, and chronological renumbering.
 
 ## modes/ responsibilities
 
-- **`mp3_cd.py`** -- Post-processes a folder of MP3s to fit within ~700 MB. Estimates a starting bitrate from total duration, iterates downward through standard bitrates (320/256/192/160/128) until the output fits, then applies metadata and renumbers files.
-- **`audio_cd.py`** -- Converts MP3s to 44.1 kHz / 16-bit stereo WAV files in an `audio_cd_ready/` subdirectory, numbered for CD burning order.
+- **`mp3_cd.py`** -- Post-processes a folder of MP3s to fit within the shared target defined in `core/constants.py`. Estimates a starting bitrate from total duration, iterates downward through the shared bitrate ladder until the output fits, then applies metadata and renumbers files.
+- **`audio_cd.py`** -- Converts MP3s to WAV files using the shared Audio CD defaults defined in `core/constants.py`, writing them to an `audio_cd_ready/` subdirectory numbered for CD burning order.
 
 ## What is intentionally not refactored
 

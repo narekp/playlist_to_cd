@@ -12,6 +12,7 @@ Extracted from the monolith into standalone, tested modules:
 | Module | Extracted logic |
 |---|---|
 | `core/artists.py` | Artist string parsing, track key generation, duration field extraction |
+| `core/constants.py` | Shared operational values for MP3 CD sizing and Audio CD conversion defaults |
 | `core/naming.py` | Filesystem-safe name generation, artist formatting for filenames and metadata |
 | `core/query.py` | YouTube search query variant building (extracted and tested, but only called from the monolith) |
 | `core/ffmpeg_utils.py` | Duration verification, size calculation, bitrate estimation, conversion, metadata tagging, file renumbering |
@@ -19,7 +20,7 @@ Extracted from the monolith into standalone, tested modules:
 | `modes/audio_cd.py` | Audio CD pipeline (MP3 to WAV conversion) |
 | `main.py` | CLI entry point for post-processing (replaces the GUI path for disc-prep tasks) |
 
-Both `main.py` and `main_original.py` import from `core/` and `modes/`. The monolith still contains its own copy of `process_folder` (the post-processing function that predates `modes/mp3_cd.process_mp3_folder`), though it now delegates to `modes/` for the actual pipeline execution.
+Both `main.py` and `main_original.py` import from `core/` and `modes/`. Shared operational values for the extracted post-processing path now live in `core/constants.py`, which centralizes the MP3 CD target/bitrate ladder and the Audio CD WAV conversion defaults. The monolith still contains its own copy of `process_folder` (the post-processing function that predates `modes/mp3_cd.process_mp3_folder`), though it now delegates to `modes/` for the actual pipeline execution.
 
 ## What has been tested
 

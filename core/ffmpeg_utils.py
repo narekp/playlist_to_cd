@@ -3,7 +3,7 @@ import shutil
 import subprocess
 
 from .naming import format_artists_for_metadata
-from .constants import MP3_TARGET_MB, WAV_SAMPLE_RATE
+from .constants import MP3_CD_TARGET_MB, AUDIO_CD_SAMPLE_RATE
 
 
 def verify_duration(file_path, expected_ms, stop_flag):
@@ -58,7 +58,7 @@ def get_total_size(folder):
     return total / (1024 * 1024)
 
 
-def estimate_required_bitrate(total_duration_sec, target_mb=MP3_TARGET_MB):
+def estimate_required_bitrate(total_duration_sec, target_mb=MP3_CD_TARGET_MB):
     if total_duration_sec <= 0:
         return 320
     target_bytes = target_mb * 1024 * 1024
@@ -86,7 +86,7 @@ def convert_to_bitrate(original_folder, temp_folder, bitrate, stop_flag):
             cmd = [
                 'ffmpeg', '-y', '-i', input_path,
                 '-b:a', f'{bitrate}k',
-                '-ar', WAV_SAMPLE_RATE,
+                '-ar', AUDIO_CD_SAMPLE_RATE,
                 output_path
             ]
             result = subprocess.run(cmd, capture_output=True, text=True)

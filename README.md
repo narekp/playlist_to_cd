@@ -50,7 +50,7 @@ python main.py --mode audio --processed-dir /path/to/mp3s
 
 **Full workflow (GUI):**
 
-1. Export your playlist from [Exportify](https://exportify.net/) and save as CSV.
+1. Export your Spotify playlist as a CSV using [Exportify](https://exportify.net/) and save as CSV.
 2. Run `python main_original.py`, choose the CSV and an output folder, pick "MP3 CD" or "Audio CD", then Start.
 3. When finished, burn the output folder to disc (for Audio CD, burn the `audio_cd_ready/` subfolder).
 
