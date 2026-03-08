@@ -14,6 +14,7 @@ def test_app_initializes_without_crash(monkeypatch):
     root = tk.Tk()
     root.withdraw()
     app = main_original.App(root)
+    title = root.title()
     root.destroy()
 
     assert app.url_entry is not None
@@ -21,4 +22,4 @@ def test_app_initializes_without_crash(monkeypatch):
     assert app.out_entry is not None
     assert app.mode_var is not None
     assert app.log is not None
-    assert root.title() == "Playlist to CD"
+    assert title == "Playlist to CD"
