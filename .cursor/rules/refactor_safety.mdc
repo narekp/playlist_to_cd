@@ -1,0 +1,12 @@
+---
+description: Rules for safe refactoring
+globs: "**/*.py"
+alwaysApply: false
+---
+
+- Never rewrite `main_original.py` unless explicitly asked.
+- Preserve current behavior before improving behavior.
+- Prefer small diffs.
+- Do not mix refactor changes with format-compatibility changes.
+- Do not move acquisition/download orchestration out of the monolith unless explicitly asked.
+- When behavior must change, call it out explicitly before implementing.

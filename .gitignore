@@ -1,0 +1,17 @@
+__pycache__/
+*.pyc
+.pytest_cache/
+.venv/
+.env
+.env.*
+state.json
+process_log.txt
+outputs/
+tests/tmp/
+
+downloaded_tracks.csv
+failed_downloads.csv
+rejected_tracks.csv
+invalid_input_rows.csv
+*_temp_*/
+audio_cd_ready/

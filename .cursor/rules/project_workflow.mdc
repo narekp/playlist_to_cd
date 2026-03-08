@@ -1,0 +1,13 @@
+---
+description: Project workflow and implementation discipline
+globs: "**/*.py"
+alwaysApply: false
+---
+
+- Preserve the working monolith as the source of truth until the modular path is fully wired.
+- Do not rewrite large sections of code unless explicitly asked.
+- Prefer extracting existing logic over inventing new architecture.
+- Before coding, state the exact files to change and why.
+- After coding, summarize behavior-preserving refactor changes separately from behavior changes.
+- For non-trivial changes, propose the smallest verification step.
+- Do not silently change file naming, ordering, or output format behavior.

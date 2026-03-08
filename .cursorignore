@@ -1,0 +1,17 @@
+# Add directories or file patterns to ignore during indexing (e.g. foo/ or *.csv)
+__pycache__/
+*.pyc
+.pytest_cache/
+.venv/
+.env
+.env.*
+state.json
+process_log.txt
+downloaded_tracks.csv
+failed_downloads.csv
+rejected_tracks.csv
+invalid_input_rows.csv
+*_temp_*/
+audio_cd_ready/
+outputs/
+tests/tmp/

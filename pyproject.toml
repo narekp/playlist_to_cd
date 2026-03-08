@@ -1,0 +1,8 @@
+[project]
+name = "playlist_to_cd"
+version = "0.1.0"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+norecursedirs = [".git", ".pytest_cache", "manual", "runs"]
+pythonpath = ["."]

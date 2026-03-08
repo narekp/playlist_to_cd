@@ -1,0 +1,23 @@
+---
+description: Testing workflow guidelines
+globs:
+  - "tests/**/*.py"
+  - "**/*.py"
+alwaysApply: false
+---
+
+- Before changing logic, inspect current file behavior first.
+- Prefer helper tests and mode-module tests before end-to-end tests.
+- Prefer local fixture files over live network tests unless explicitly requested.
+- After changes, propose one minimal smoke test and one focused unit test.
+- If a change affects ffmpeg behavior, naming, ordering, or metadata, mention that explicitly in the test plan.
+- Do not claim refactor success without a verification path.
+- Prefer behavior-focused tests over implementation-detail tests.
+- Do not generate tests only to increase test count.
+- Avoid asserting exact internal helper calls unless that interaction is itself important behavior.
+- Avoid asserting full log output unless the log content is part of the intended contract.
+- Prefer one meaningful test per behavior branch over many near-duplicate tests.
+- Use mocking only at external boundaries (ffmpeg, ffprobe, network, filesystem side effects) unless deeper mocking is truly necessary.
+- Before adding tests, briefly state what regression each new test is meant to catch.
+- Do not run the full test suite after every tiny change unless explicitly asked.
+- Prefer running the smallest relevant subset first, then the full suite only at meaningful checkpoints.

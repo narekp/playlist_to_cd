@@ -1,0 +1,7 @@
+---
+description: Plan mode safety – no edits without approval
+alwaysApply: true
+---
+
+- In Plan mode, do not edit any file or run any command unless explicitly approved.
+- Only produce a plan summary; wait for user confirmation before making changes.
