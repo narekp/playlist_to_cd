@@ -4,6 +4,7 @@ __pycache__/
 .venv/
 .env
 .env.*
+!.env.example
 .DS_Store
 state.json
 process_log.txt
@@ -17,3 +18,4 @@ rejected_tracks.csv
 invalid_input_rows.csv
 *_temp_*/
 audio_cd_ready/
+.spotify_token_cache
