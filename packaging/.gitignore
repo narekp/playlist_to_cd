@@ -1,0 +1,9 @@
+# Bundled binaries (obtain per bin/README.md)
+bin/ffmpeg
+bin/ffprobe
+bin/yt-dlp
+
+# PyInstaller build artifacts
+build/
+dist/
+*.spec.bak

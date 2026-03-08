@@ -93,3 +93,18 @@ pytest
 ```
 
 Test configuration lives in `pyproject.toml`. The suite contains 70 test functions across 7 test files, covering all extracted modules (`core/` and `modes/`). Tests mock external boundaries (ffmpeg, ffprobe, subprocess, filesystem) and do not require network access.
+
+## Building the macOS app
+
+To package the GUI as a standalone macOS `.app`:
+
+1. **Prerequisites:** PyInstaller (`pip install pyinstaller`), and the external binaries in `packaging/bin/`. See `packaging/bin/README.md` for how to obtain ffmpeg, ffprobe, and yt-dlp.
+
+2. **Build:**
+   ```bash
+   ./packaging/build_macos.sh
+   ```
+
+3. **Output:** `dist/playlist_to_cd.app` — double-click or `open dist/playlist_to_cd.app` to run.
+
+The build script uses the project `.venv` if it exists and has PyInstaller installed.
