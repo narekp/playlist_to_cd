@@ -2,6 +2,7 @@ import os
 import subprocess
 
 from core.naming import safe_name
+from core.constants import WAV_SAMPLE_RATE, WAV_CHANNELS, WAV_SAMPLE_FMT
 
 
 def convert_to_wav(mp3_path, wav_path, stop_flag):
@@ -14,11 +15,11 @@ def convert_to_wav(mp3_path, wav_path, stop_flag):
         "-i",
         mp3_path,
         "-ar",
-        "44100",
+        WAV_SAMPLE_RATE,
         "-ac",
-        "2",
+        WAV_CHANNELS,
         "-sample_fmt",
-        "s16",
+        WAV_SAMPLE_FMT,
         wav_path,
     ]
     result = subprocess.run(cmd, capture_output=True, text=True)

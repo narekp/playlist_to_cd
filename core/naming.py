@@ -1,13 +1,14 @@
 import re
 
 from .artists import split_artists
+from .constants import SAFE_FILENAME_MAX_LENGTH
 
 
 def safe_name(value: str) -> str:
     value = (value or "").strip()
     value = re.sub(r'[<>:"/\\|?*\x00-\x1F]', "_", value)
     value = re.sub(r"\s+", " ", value).strip()
-    return value[:180] if value else "unknown"
+    return value[:SAFE_FILENAME_MAX_LENGTH] if value else "unknown"
 
 
 def format_artists_for_filename(artist_text):

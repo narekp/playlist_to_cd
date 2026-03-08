@@ -8,6 +8,7 @@ from core.ffmpeg_utils import (
     renumber_files,
     estimate_required_bitrate,
 )
+from core.constants import MP3_TARGET_MB, MP3_BITRATE_LADDER
 
 
 def process_mp3_folder(folder, log_queue, stop_flag, start_bitrate):
@@ -16,14 +17,14 @@ def process_mp3_folder(folder, log_queue, stop_flag, start_bitrate):
     total_size = get_total_size(folder)
     log_queue.put(f"[POST] Initial accepted MP3 total: {total_size:.2f} MB")
 
-    if total_size <= 699:
+    if total_size <= MP3_TARGET_MB:
         set_metadata(folder, stop_flag)
         renumber_files(folder)
         final_size = get_total_size(folder)
         log_queue.put(f"[POST] Final MP3 total: {final_size:.2f} MB")
         return
 
-    bitrates = [320, 256, 192, 160, 128]
+    bitrates = MP3_BITRATE_LADDER
     # Find index of start_bitrate (default to 0 if not found)
     try:
         start_index = bitrates.index(start_bitrate)
@@ -38,20 +39,20 @@ def process_mp3_folder(folder, log_queue, stop_flag, start_bitrate):
         convert_to_bitrate(folder, temp_folder, br, stop_flag)
         temp_size = get_total_size(temp_folder)
         log_queue.put(f"[POST] After {br} kbps: {temp_size:.2f} MB")
-        if temp_size <= 699:
+        if temp_size <= MP3_TARGET_MB:
             last_temp = temp_folder
             final_temp_size = temp_size
             break
-        if br == 128:
+        if br == MP3_BITRATE_LADDER[-1]:
             last_temp = temp_folder
             final_temp_size = temp_size
         else:
             shutil.rmtree(temp_folder)
 
     if last_temp:
-        if final_temp_size > 699:
+        if final_temp_size > MP3_TARGET_MB:
             log_queue.put(
-                f"[POST] WARNING: Even at 128 kbps, final size is still {final_temp_size:.2f} MB and exceeds the 700 MB target."
+                f"[POST] WARNING: Even at {MP3_BITRATE_LADDER[-1]} kbps, final size is still {final_temp_size:.2f} MB and exceeds the 700 MB target."
             )
         for f in os.listdir(folder):
             if f.endswith('.mp3'):
@@ -74,7 +75,7 @@ def process_mp3_folder(folder, log_queue, stop_flag, start_bitrate):
 def run_mp3_pipeline(processed_dir, log_queue, stop_flag, accepted_duration_sec):
     required_kbps = estimate_required_bitrate(accepted_duration_sec)
     cushioned = int(required_kbps * 0.95)
-    bitrates = [320, 256, 192, 160, 128]
+    bitrates = MP3_BITRATE_LADDER
     start_bitrate = 128
     for br in bitrates:
         if br <= cushioned:
