@@ -182,12 +182,24 @@ def process_folder(folder, log_queue, stop_flag, start_bitrate):
     log_queue.put(f"[POST] Final MP3 total: {final_size:.2f} MB")
 
 def check_dependencies():
+    """Return (True, []) if all deps found, else (False, [missing_names])."""
     deps = {'yt-dlp': 'yt-dlp --version', 'ffmpeg': 'ffmpeg -version', 'ffprobe': 'ffprobe -version'}
+    missing = []
     for name, cmd in deps.items():
         result = subprocess.run(cmd, shell=True, capture_output=True)
         if result.returncode != 0:
-            return False, f"{name} not found."
-    return True, ""
+            missing.append(name)
+    return (True, []) if not missing else (False, missing)
+
+
+def _format_missing_deps_message(missing):
+    return (
+        f"Missing required dependencies: {', '.join(missing)}\n\n"
+        "The app could not find these tools on your system PATH.\n"
+        "Please install them (e.g., using Homebrew: 'brew install ffmpeg yt-dlp')\n"
+        "or ensure they are located in /opt/homebrew/bin or /usr/local/bin."
+    )
+
 
 class App:
     def __init__(self, root):
@@ -195,9 +207,9 @@ class App:
         root.title("Media Batch Processor MVP")
         root.geometry("600x400")
 
-        ok, msg = check_dependencies()
+        ok, missing = check_dependencies()
         if not ok:
-            messagebox.showerror("Error", f"Missing: {msg}. Install them.")
+            messagebox.showerror("Error", _format_missing_deps_message(missing))
             sys.exit(1)
 
         tk.Label(root, text="Playlist URL:").pack(pady=5)
