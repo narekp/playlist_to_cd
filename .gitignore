@@ -4,10 +4,12 @@ __pycache__/
 .venv/
 .env
 .env.*
+.DS_Store
 state.json
 process_log.txt
 outputs/
 tests/tmp/
+tests/manual/runs/
 
 downloaded_tracks.csv
 failed_downloads.csv
