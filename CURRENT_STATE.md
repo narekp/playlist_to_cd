@@ -4,6 +4,7 @@
 
 - **Full CSV-to-CD workflow** via the legacy monolith (`main_original.py`): CSV import, YouTube download, duration validation, MP3 CD or Audio CD post-processing, resume support, and report generation. This runs through a Tkinter GUI.
 - **Post-processing / disc-prep** via the extracted modular path (`main.py` + `core/` + `modes/`): given a directory of MP3 files, the CLI can run either the MP3 CD pipeline (bitrate fitting, metadata, renumbering) or the Audio CD pipeline (WAV conversion).
+- **Local macOS packaging** via `packaging/build_macos.sh`: builds `Spotify Playlist to Disk Converter.app` and a local distribution DMG (`Spotify_Playlist_to_Disk_Converter_0.1.0.dmg`) using `hdiutil`.
 
 ## What has been refactored
 
@@ -44,3 +45,4 @@ Tests mock external boundaries (ffmpeg, ffprobe, subprocess, filesystem side eff
 - **Add CLI support for the full workflow** (CSV input, download, post-processing) without requiring the Tkinter GUI.
 - **Explore web interface** as a possible replacement for the Tkinter GUI (no code or decisions exist for this yet).
 - **Add integration tests** that exercise ffmpeg/ffprobe with real files (current tests are fully mocked).
+- **Add macOS signing/notarization** for smoother Gatekeeper behavior in public distribution.

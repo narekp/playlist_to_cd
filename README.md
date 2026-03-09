@@ -96,15 +96,36 @@ Test configuration lives in `pyproject.toml`. The suite contains 70 test functio
 
 ## Building the macOS app
 
-To package the GUI as a standalone macOS `.app`:
+To package the GUI as a standalone macOS `.app` and local `.dmg`:
 
-1. **Prerequisites:** PyInstaller (`pip install pyinstaller`), and the external binaries in `packaging/bin/`. See `packaging/bin/README.md` for how to obtain ffmpeg, ffprobe, and yt-dlp.
+1. **Prerequisites:** PyInstaller (`pip install pyinstaller`) and the external binaries in `packaging/bin/`.
+   See `packaging/bin/README.md` for how to obtain `ffmpeg`, `ffprobe`, and `yt-dlp`.
 
 2. **Build:**
    ```bash
    ./packaging/build_macos.sh
    ```
 
-3. **Output:** `dist/playlist_to_cd.app` — double-click or `open dist/playlist_to_cd.app` to run.
+3. **Output:**
+   - `dist/Spotify Playlist to Disk Converter.app`
+   - `dist/Spotify_Playlist_to_Disk_Converter_0.1.0.dmg`
 
 The build script uses the project `.venv` if it exists and has PyInstaller installed.
+
+## Installing and running from DMG (local)
+
+1. Open `dist/Spotify_Playlist_to_Disk_Converter_0.1.0.dmg`.
+2. Copy `Spotify Playlist to Disk Converter.app` to `Applications` (or another local folder).
+3. Launch the app from Finder.
+
+Because this build is unsigned and not notarized, macOS Gatekeeper may block first launch.
+If that happens, right-click the app and choose **Open**. If needed, remove quarantine:
+
+```bash
+xattr -dr com.apple.quarantine "/Applications/Spotify Playlist to Disk Converter.app"
+```
+
+### Target machine dependency expectations
+
+- **Preferred:** Build with `ffmpeg`, `ffprobe`, and `yt-dlp` present in `packaging/bin/` so they are bundled inside the app.
+- **Fallback:** If they are not bundled, the target Mac must provide those binaries on `PATH`, or the app will show missing-dependency errors at startup.

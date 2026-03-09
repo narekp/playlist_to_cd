@@ -21,3 +21,4 @@ audio_cd_ready/
 # PyInstaller build output
 dist/
 build/
+*.dmg
