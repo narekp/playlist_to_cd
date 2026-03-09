@@ -36,6 +36,7 @@ fi
 # Build
 pyinstaller --noconfirm --clean "$SPEC_FILE"
 
+# Must match BUNDLE name in playlist_to_cd.spec
 APP_NAME="playlist_to_cd.app"
 APP_PATH="$PROJECT_ROOT/dist/$APP_NAME"
 DMG_NAME="playlist_to_cd_0.1.0.dmg"
