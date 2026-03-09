@@ -36,5 +36,26 @@ fi
 # Build
 pyinstaller --noconfirm --clean "$SPEC_FILE"
 
+# Must match BUNDLE name in playlist_to_cd.spec
+APP_NAME="playlist_to_cd.app"
+APP_PATH="$PROJECT_ROOT/dist/$APP_NAME"
+DMG_NAME="playlist_to_cd_0.1.0.dmg"
+DMG_PATH="$PROJECT_ROOT/dist/$DMG_NAME"
+
+if [[ ! -d "$APP_PATH" ]]; then
+    echo "Expected app bundle not found: $APP_PATH" >&2
+    exit 1
+fi
+
+# Remove .DS_Store from app bundle before creating DMG
+find "$APP_PATH" -name ".DS_Store" -delete 2>/dev/null || true
+
+hdiutil create \
+    -volname "playlist_to_cd" \
+    -srcfolder "$APP_PATH" \
+    -ov -format UDZO \
+    -o "$DMG_PATH"
+
 echo ""
-echo "Build complete. App: $PROJECT_ROOT/dist/Spotify Playlist to Disk Converter.app"
+echo "Build complete. App: $APP_PATH"
+echo "DMG created: $DMG_PATH"

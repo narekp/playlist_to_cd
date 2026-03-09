@@ -4,7 +4,7 @@
 
 - **Full CSV-to-CD workflow** via the desktop app (`main_original.py`): CSV import, YouTube download, duration validation, MP3 CD or Audio CD post-processing, resume support, and report generation. This runs through the Tkinter GUI and is the main supported product path.
 - **Post-processing / disc-prep** via the extracted modular path (`main.py` + `core/` + `modes/`): given a directory of MP3 files, the CLI can run either the MP3 CD pipeline (bitrate fitting, metadata, renumbering) or the Audio CD pipeline (WAV conversion).
-- **Packaged macOS app build** via PyInstaller: the Tkinter workflow can be shipped and launched as a standalone `.app`.
+- **Local macOS packaging** via `packaging/build_macos.sh`: builds `playlist_to_cd.app` and a local distribution DMG (`playlist_to_cd_0.1.0.dmg`) using `hdiutil`.
 
 ## What has been refactored
 
@@ -58,3 +58,4 @@ The chosen direction is the simpler CSV-first loop:
 - **Extract more reusable non-UI logic** from `main_original.py` as low-risk opportunities appear.
 - **Keep improving packaged-app usability** on macOS.
 - **Add integration tests** that exercise ffmpeg/ffprobe with real files (current tests are fully mocked).
+- **Add macOS signing/notarization** for smoother Gatekeeper behavior in public distribution.

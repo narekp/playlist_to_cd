@@ -65,10 +65,11 @@ coll = COLLECT(
 )
 
 # macOS .app bundle (only used when building on macOS)
+# Bundle name must match APP_NAME in packaging/build_macos.sh
 if sys.platform == "darwin":
     app = BUNDLE(
         coll,
-        name="Spotify Playlist to Disk Converter.app",
+        name="playlist_to_cd.app",
         icon=None,
         bundle_identifier="net.exportify.playlist_to_cd",
         version="0.1.0",

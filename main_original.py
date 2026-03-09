@@ -205,6 +205,8 @@ class App:
     def __init__(self, root):
         self.root = root
         root.title("Playlist to CD")
+        root.geometry("700x650")
+        root.minsize(600, 550)
 
         ok, missing = check_dependencies()
         if not ok:
@@ -252,12 +254,15 @@ class App:
         progress_frame = tk.LabelFrame(main_frame, text="Progress", padx=8, pady=6)
         progress_frame.pack(fill=tk.X, pady=(0, 8))
         self.progress = ttk.Progressbar(progress_frame, length=400, mode='determinate')
-        self.progress.pack(pady=4)
+        self.progress.pack(pady=4, fill=tk.X)
 
         # Log area (expands on resize)
         log_frame = tk.LabelFrame(root, text="Log", padx=6, pady=6)
         log_frame.pack(fill=tk.BOTH, expand=True, padx=12, pady=(0, 10))
         self.log = scrolledtext.ScrolledText(log_frame, height=10)
+        self.log.tag_configure("ok", foreground="#2e8b57")
+        self.log.tag_configure("warn", foreground="#b8860b")
+        self.log.tag_configure("error", foreground="#cc0000")
         self.log.pack(fill=tk.BOTH, expand=True)
 
         self.log_queue = queue.Queue()
@@ -266,12 +271,11 @@ class App:
         self.executor = None
         self.root.after(100, self.process_queue)
 
-        # Set size and position after layout so the window opens at full size
-        root.minsize(500, 450)
-        width, height = 720, 580
+        # Set size and position after layout so the window opens centered
         root.update_idletasks()
         sw = root.winfo_screenwidth()
         sh = root.winfo_screenheight()
+        width, height = 700, 650
         x = max(0, (sw - width) // 2)
         y = max(0, (sh - height) // 2)
         root.geometry(f"{width}x{height}+{x}+{y}")
@@ -279,6 +283,15 @@ class App:
         root.lift()
         root.attributes("-topmost", True)
         root.attributes("-topmost", False)
+
+    def _tag_for(self, msg):
+        if msg.startswith("[OK]") or msg.startswith("[META-ACCEPT]") or msg == "Completed successfully.":
+            return "ok"
+        if "WARNING" in msg or msg.startswith("[SKIP]") or msg.startswith("[SKIP-INVALID-ROW]") or msg.startswith("[REJECTED]") or msg.startswith("[META-REJECT]") or msg.startswith("Completed with issues"):
+            return "warn"
+        if msg.startswith("[FAILED]") or msg.startswith("[DOWNLOAD-FAIL]") or msg.startswith("[POST-REJECT]") or msg.startswith("Post-processing failed") or msg.startswith("Worker error"):
+            return "error"
+        return None
 
     def process_queue(self):
         try:
@@ -291,7 +304,11 @@ class App:
                 elif msg == "[PROGRESS INC]":
                     self.progress['value'] += 1
                 else:
-                    self.log.insert(tk.END, msg + '\n')
+                    tag = self._tag_for(msg)
+                    if tag:
+                        self.log.insert(tk.END, msg + '\n', tag)
+                    else:
+                        self.log.insert(tk.END, msg + '\n')
                     self.log.see(tk.END)
         except queue.Empty:
             pass
