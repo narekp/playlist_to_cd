@@ -68,7 +68,7 @@ coll = COLLECT(
 if sys.platform == "darwin":
     app = BUNDLE(
         coll,
-        name="playlist_to_cd.app",
+        name="Spotify Playlist to Disk Converter.app",
         icon=None,
         bundle_identifier="net.exportify.playlist_to_cd",
         version="0.1.0",

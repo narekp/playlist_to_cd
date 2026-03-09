@@ -5,13 +5,13 @@ from unittest.mock import patch
 
 import pytest
 
-# Regression: App instantiation, geometry, and log tags
-# Catches accidental shrinkage of window or removal of tag configuration
+# Regression: App instantiation, geometry, log tags, product naming
+# Catches accidental shrinkage of window, removal of tag configuration, or layout breakage
 
 
 @pytest.fixture
 def mock_deps():
-    with patch("main_original.check_dependencies", return_value=(True, "")):
+    with patch("main_original.check_dependencies", return_value=(True, [])):
         yield
 
 
@@ -24,6 +24,11 @@ def test_app_instantiates_with_hidden_root(mock_deps):
         app = main_original.App(root)
         assert app.log is not None
         assert app.progress is not None
+        assert app.url_entry is not None
+        assert app.csv_entry is not None
+        assert app.out_entry is not None
+        assert app.mode_var is not None
+        assert root.title() == "Playlist to CD"
     finally:
         root.destroy()
 

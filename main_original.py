@@ -182,68 +182,107 @@ def process_folder(folder, log_queue, stop_flag, start_bitrate):
     log_queue.put(f"[POST] Final MP3 total: {final_size:.2f} MB")
 
 def check_dependencies():
+    """Return (True, []) if all deps found, else (False, [missing_names])."""
     deps = {'yt-dlp': 'yt-dlp --version', 'ffmpeg': 'ffmpeg -version', 'ffprobe': 'ffprobe -version'}
+    missing = []
     for name, cmd in deps.items():
         result = subprocess.run(cmd, shell=True, capture_output=True)
         if result.returncode != 0:
-            return False, f"{name} not found."
-    return True, ""
+            missing.append(name)
+    return (True, []) if not missing else (False, missing)
+
+
+def _format_missing_deps_message(missing):
+    return (
+        f"Missing required dependencies: {', '.join(missing)}\n\n"
+        "The app could not find these tools on your system PATH.\n"
+        "Please install them (e.g., using Homebrew: 'brew install ffmpeg yt-dlp')\n"
+        "or ensure they are located in /opt/homebrew/bin or /usr/local/bin."
+    )
+
 
 class App:
     def __init__(self, root):
         self.root = root
-        root.title("Media Batch Processor MVP")
+        root.title("Playlist to CD")
         root.geometry("700x650")
         root.minsize(600, 550)
 
-        ok, msg = check_dependencies()
+        ok, missing = check_dependencies()
         if not ok:
-            messagebox.showerror("Error", f"Missing: {msg}. Install them.")
+            messagebox.showerror("Error", _format_missing_deps_message(missing))
             sys.exit(1)
 
-        tk.Label(root, text="Playlist URL:").pack(pady=5)
-        self.url_entry = tk.Entry(root, width=50)
-        self.url_entry.pack()
+        main_frame = tk.Frame(root, padx=12, pady=10)
+        main_frame.pack(fill=tk.X)
 
-        tk.Button(root, text="Open Exportify for CSV", command=self.open_exportify).pack(pady=5)
+        # Source: Playlist URL + CSV file
+        source_frame = tk.LabelFrame(main_frame, text="Source", padx=8, pady=6)
+        source_frame.pack(fill=tk.X, pady=(0, 8))
+        tk.Label(source_frame, text="Playlist URL:").pack(pady=4)
+        self.url_entry = tk.Entry(source_frame, width=50)
+        self.url_entry.pack(pady=4)
+        tk.Button(source_frame, text="Open Exportify for CSV", command=self.open_exportify).pack(pady=4)
+        tk.Label(source_frame, text="CSV File:").pack(pady=4)
+        self.csv_entry = tk.Entry(source_frame, width=50)
+        self.csv_entry.pack(pady=4)
+        tk.Button(source_frame, text="Browse CSV", command=self.browse_csv).pack(pady=4)
 
-        tk.Label(root, text="CSV File:").pack(pady=5)
-        self.csv_entry = tk.Entry(root, width=50)
-        self.csv_entry.pack()
-        tk.Button(root, text="Browse CSV", command=self.browse_csv).pack(pady=5)
+        # Destination: Output folder
+        dest_frame = tk.LabelFrame(main_frame, text="Output", padx=8, pady=6)
+        dest_frame.pack(fill=tk.X, pady=(0, 8))
+        tk.Label(dest_frame, text="Output Folder:").pack(pady=4)
+        self.out_entry = tk.Entry(dest_frame, width=50)
+        self.out_entry.pack(pady=4)
+        tk.Button(dest_frame, text="Browse Folder", command=self.browse_folder).pack(pady=4)
 
-        tk.Label(root, text="Output Folder:").pack(pady=5)
-        self.out_entry = tk.Entry(root, width=50)
-        self.out_entry.pack()
-
-        tk.Label(root, text="Output Mode:").pack(pady=5)
+        # Mode and actions
+        mode_actions_frame = tk.LabelFrame(main_frame, text="Mode & actions", padx=8, pady=6)
+        mode_actions_frame.pack(fill=tk.X, pady=(0, 8))
+        tk.Label(mode_actions_frame, text="Output Mode:").pack(pady=4)
         self.mode_var = tk.StringVar(value="mp3")
-        mode_frame = tk.Frame(root)
-        mode_frame.pack()
+        mode_frame = tk.Frame(mode_actions_frame)
+        mode_frame.pack(pady=4)
         tk.Radiobutton(mode_frame, text="MP3 CD", variable=self.mode_var, value="mp3").pack(side=tk.LEFT)
         tk.Radiobutton(mode_frame, text="Audio CD", variable=self.mode_var, value="audio").pack(side=tk.LEFT)
+        self.start_btn = tk.Button(mode_actions_frame, text="Start", command=self.start_process)
+        self.start_btn.pack(pady=4)
+        self.stop_btn = tk.Button(mode_actions_frame, text="Stop", command=self.stop_process, state='disabled')
+        self.stop_btn.pack(pady=4)
 
-        tk.Button(root, text="Browse Folder", command=self.browse_folder).pack(pady=5)
+        # Progress
+        progress_frame = tk.LabelFrame(main_frame, text="Progress", padx=8, pady=6)
+        progress_frame.pack(fill=tk.X, pady=(0, 8))
+        self.progress = ttk.Progressbar(progress_frame, length=400, mode='determinate')
+        self.progress.pack(pady=4, fill=tk.X)
 
-        self.start_btn = tk.Button(root, text="Start", command=self.start_process)
-        self.start_btn.pack(pady=5)
-        self.stop_btn = tk.Button(root, text="Stop New Tasks", command=self.stop_process, state='disabled')
-        self.stop_btn.pack(pady=5)
-
-        self.progress = ttk.Progressbar(root, length=400, mode='determinate')
-        self.progress.pack(pady=5, fill=tk.X)
-
-        self.log = scrolledtext.ScrolledText(root, height=10)
+        # Log area (expands on resize)
+        log_frame = tk.LabelFrame(root, text="Log", padx=6, pady=6)
+        log_frame.pack(fill=tk.BOTH, expand=True, padx=12, pady=(0, 10))
+        self.log = scrolledtext.ScrolledText(log_frame, height=10)
         self.log.tag_configure("ok", foreground="#2e8b57")
         self.log.tag_configure("warn", foreground="#b8860b")
         self.log.tag_configure("error", foreground="#cc0000")
-        self.log.pack(pady=5, fill=tk.BOTH, expand=True)
+        self.log.pack(fill=tk.BOTH, expand=True)
 
         self.log_queue = queue.Queue()
         self.stop_flag = threading.Event()
         self.finished_flag = threading.Event()
         self.executor = None
         self.root.after(100, self.process_queue)
+
+        # Set size and position after layout so the window opens centered
+        root.update_idletasks()
+        sw = root.winfo_screenwidth()
+        sh = root.winfo_screenheight()
+        width, height = 700, 650
+        x = max(0, (sw - width) // 2)
+        y = max(0, (sh - height) // 2)
+        root.geometry(f"{width}x{height}+{x}+{y}")
+        root.update_idletasks()
+        root.lift()
+        root.attributes("-topmost", True)
+        root.attributes("-topmost", False)
 
     def _tag_for(self, msg):
         if msg.startswith("[OK]") or msg.startswith("[META-ACCEPT]") or msg == "Completed successfully.":
@@ -276,22 +315,29 @@ class App:
         self.root.after(100, self.process_queue)
 
     def open_exportify(self):
-        url = self.url_entry.get()
+        url = (self.url_entry.get() or "").strip()
         if url:
             parsed = urlparse(url)
-            playlist_id = parsed.path.rstrip('/').split('/')[-1]
-            export_url = f"https://exportify.net/?playlist={playlist_id}"
-            webbrowser.open(export_url)
-            self.log_queue.put("Opened Exportify—export CSV and select below.")
+            playlist_id = parsed.path.rstrip("/").split("/")[-1]
+            if playlist_id:
+                export_url = f"https://exportify.net/?playlist={playlist_id}"
+                webbrowser.open(export_url)
+                self.log_queue.put("Opened Exportify with playlist—export CSV, then use Browse CSV below.")
+                return
+        webbrowser.open("https://exportify.net/")
+        self.log_queue.put("Opened Exportify. Paste your Spotify playlist link there, export CSV, then use Browse CSV below.")
 
     def browse_csv(self):
-        path = filedialog.askopenfilename(filetypes=[("CSV Files", "*.csv")])
+        path = filedialog.askopenfilename(
+            filetypes=[("CSV Files", "*.csv")],
+            initialdir=os.path.expanduser("~/Downloads"),
+        )
         if path:
             self.csv_entry.delete(0, tk.END)
             self.csv_entry.insert(0, path)
 
     def browse_folder(self):
-        path = filedialog.askdirectory()
+        path = filedialog.askdirectory(initialdir=os.path.expanduser("~/Desktop"))
         if path:
             self.out_entry.delete(0, tk.END)
             self.out_entry.insert(0, path)
