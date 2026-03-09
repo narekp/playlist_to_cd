@@ -84,3 +84,12 @@ The following remain in `main_original.py` by design, pending future extraction:
 - **State management** -- `state.json` for resume support, report CSVs (downloaded, failed, rejected tracks).
 - **GUI** -- Tkinter interface, progress bar, queue-based logging, start/stop controls.
 - **`core/query.py` wiring** -- The module is extracted and tested, but only called from the monolith. `main.py` does not use it because it does not handle downloads.
+
+## Packaging
+
+The macOS app is built via `packaging/build_macos.sh`. Outputs:
+
+- `dist/playlist_to_cd.app` — the packaged application bundle
+- `dist/playlist_to_cd_0.1.0.dmg` — local distribution DMG
+
+The app name and DMG name are derived from `pyproject.toml` version and `playlist_to_cd.spec`; `build_macos.sh` must match these names. Distribution is unsigned and local-only; signing and notarization are deferred. External dependencies (ffmpeg, ffprobe, yt-dlp) are bundled from `packaging/bin/` when present.

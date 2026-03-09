@@ -39,6 +39,7 @@ pyinstaller --noconfirm --clean "$SPEC_FILE"
 # Must match BUNDLE name in playlist_to_cd.spec
 APP_NAME="playlist_to_cd.app"
 APP_PATH="$PROJECT_ROOT/dist/$APP_NAME"
+# DMG_NAME must match: playlist_to_cd_<version>.dmg where version comes from pyproject.toml
 DMG_NAME="playlist_to_cd_0.1.0.dmg"
 DMG_PATH="$PROJECT_ROOT/dist/$DMG_NAME"
 
@@ -55,6 +56,11 @@ hdiutil create \
     -srcfolder "$APP_PATH" \
     -ov -format UDZO \
     -o "$DMG_PATH"
+
+if [[ ! -f "$DMG_PATH" ]]; then
+    echo "Expected DMG not found: $DMG_PATH" >&2
+    exit 1
+fi
 
 echo ""
 echo "Build complete. App: $APP_PATH"

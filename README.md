@@ -142,6 +142,8 @@ If that happens, right-click the app and choose **Open**. If needed, remove quar
 xattr -dr com.apple.quarantine "/Applications/playlist_to_cd.app"
 ```
 
+Signing and notarization are deferred; distribution is local/unsigned only for now.
+
 ### Target machine dependency expectations
 
 - **Preferred:** Build with `ffmpeg`, `ffprobe`, and `yt-dlp` present in `packaging/bin/` so they are bundled inside the app.
