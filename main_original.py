@@ -193,7 +193,8 @@ class App:
     def __init__(self, root):
         self.root = root
         root.title("Media Batch Processor MVP")
-        root.geometry("600x400")
+        root.geometry("700x650")
+        root.minsize(600, 550)
 
         ok, msg = check_dependencies()
         if not ok:
@@ -230,16 +231,28 @@ class App:
         self.stop_btn.pack(pady=5)
 
         self.progress = ttk.Progressbar(root, length=400, mode='determinate')
-        self.progress.pack(pady=5)
+        self.progress.pack(pady=5, fill=tk.X)
 
         self.log = scrolledtext.ScrolledText(root, height=10)
-        self.log.pack(pady=5)
+        self.log.tag_configure("ok", foreground="#2e8b57")
+        self.log.tag_configure("warn", foreground="#b8860b")
+        self.log.tag_configure("error", foreground="#cc0000")
+        self.log.pack(pady=5, fill=tk.BOTH, expand=True)
 
         self.log_queue = queue.Queue()
         self.stop_flag = threading.Event()
         self.finished_flag = threading.Event()
         self.executor = None
         self.root.after(100, self.process_queue)
+
+    def _tag_for(self, msg):
+        if msg.startswith("[OK]") or msg.startswith("[META-ACCEPT]") or msg == "Completed successfully.":
+            return "ok"
+        if "WARNING" in msg or msg.startswith("[SKIP]") or msg.startswith("[SKIP-INVALID-ROW]") or msg.startswith("[REJECTED]") or msg.startswith("[META-REJECT]") or msg.startswith("Completed with issues"):
+            return "warn"
+        if msg.startswith("[FAILED]") or msg.startswith("[DOWNLOAD-FAIL]") or msg.startswith("[POST-REJECT]") or msg.startswith("Post-processing failed") or msg.startswith("Worker error"):
+            return "error"
+        return None
 
     def process_queue(self):
         try:
@@ -252,7 +265,11 @@ class App:
                 elif msg == "[PROGRESS INC]":
                     self.progress['value'] += 1
                 else:
-                    self.log.insert(tk.END, msg + '\n')
+                    tag = self._tag_for(msg)
+                    if tag:
+                        self.log.insert(tk.END, msg + '\n', tag)
+                    else:
+                        self.log.insert(tk.END, msg + '\n')
                     self.log.see(tk.END)
         except queue.Empty:
             pass

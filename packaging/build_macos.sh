@@ -36,9 +36,9 @@ fi
 # Build
 pyinstaller --noconfirm --clean "$SPEC_FILE"
 
-APP_NAME="Spotify Playlist to Disk Converter.app"
+APP_NAME="playlist_to_cd.app"
 APP_PATH="$PROJECT_ROOT/dist/$APP_NAME"
-DMG_NAME="Spotify_Playlist_to_Disk_Converter_0.1.0.dmg"
+DMG_NAME="playlist_to_cd_0.1.0.dmg"
 DMG_PATH="$PROJECT_ROOT/dist/$DMG_NAME"
 
 if [[ ! -d "$APP_PATH" ]]; then
@@ -46,8 +46,11 @@ if [[ ! -d "$APP_PATH" ]]; then
     exit 1
 fi
 
+# Remove .DS_Store from app bundle before creating DMG
+find "$APP_PATH" -name ".DS_Store" -delete 2>/dev/null || true
+
 hdiutil create \
-    -volname "Spotify Playlist to Disk Converter" \
+    -volname "playlist_to_cd" \
     -srcfolder "$APP_PATH" \
     -ov -format UDZO \
     -o "$DMG_PATH"

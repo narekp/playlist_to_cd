@@ -107,22 +107,22 @@ To package the GUI as a standalone macOS `.app` and local `.dmg`:
    ```
 
 3. **Output:**
-   - `dist/Spotify Playlist to Disk Converter.app`
-   - `dist/Spotify_Playlist_to_Disk_Converter_0.1.0.dmg`
+   - `dist/playlist_to_cd.app`
+   - `dist/playlist_to_cd_0.1.0.dmg`
 
 The build script uses the project `.venv` if it exists and has PyInstaller installed.
 
 ## Installing and running from DMG (local)
 
-1. Open `dist/Spotify_Playlist_to_Disk_Converter_0.1.0.dmg`.
-2. Copy `Spotify Playlist to Disk Converter.app` to `Applications` (or another local folder).
+1. Open `dist/playlist_to_cd_0.1.0.dmg`.
+2. Copy `playlist_to_cd.app` to `Applications` (or another local folder).
 3. Launch the app from Finder.
 
 Because this build is unsigned and not notarized, macOS Gatekeeper may block first launch.
 If that happens, right-click the app and choose **Open**. If needed, remove quarantine:
 
 ```bash
-xattr -dr com.apple.quarantine "/Applications/Spotify Playlist to Disk Converter.app"
+xattr -dr com.apple.quarantine "/Applications/playlist_to_cd.app"
 ```
 
 ### Target machine dependency expectations
