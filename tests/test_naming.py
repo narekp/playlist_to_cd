@@ -1,5 +1,4 @@
 """Tests for core.naming."""
-import pytest
 
 from core.naming import format_artists_for_filename, format_artists_for_metadata, safe_name
 

@@ -1,31 +1,31 @@
 #!/usr/bin/env python3
 import csv
-import os
-import re
-import sys
-import subprocess
-import time
-import shutil
-import tkinter as tk
-from tkinter import filedialog, ttk, scrolledtext, messagebox
-import webbrowser
-from concurrent.futures import ThreadPoolExecutor, as_completed, CancelledError
-import threading
-import queue
 import json
+import os
+import queue
+import shutil
+import subprocess
+import sys
+import threading
+import time
+import tkinter as tk
+import webbrowser
+from concurrent.futures import CancelledError, ThreadPoolExecutor, as_completed
+from tkinter import filedialog, messagebox, scrolledtext, ttk
 from urllib.parse import urlparse
-from core.artists import split_artists, get_duration_ms, make_track_key
-from sources.csv_source import load_tracks_from_csv
-from core.naming import safe_name, format_artists_for_filename
-from core.query import build_query_variants
+
+from core.artists import get_duration_ms, make_track_key
 from core.ffmpeg_utils import (
-    get_total_size,
-    estimate_required_bitrate,
     convert_to_bitrate,
-    set_metadata,
+    estimate_required_bitrate,
+    get_total_size,
     renumber_files,
+    set_metadata,
     verify_duration,
 )
+from core.naming import format_artists_for_filename, safe_name
+from core.query import build_query_variants
+from sources.csv_source import load_tracks_from_csv
 
 # =====================================
 # Media Batch Processor MVP (v2.2 – Skip invalid CSV rows)

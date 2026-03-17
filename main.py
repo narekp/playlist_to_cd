@@ -3,8 +3,8 @@ import os
 import sys
 import threading
 
-from modes.mp3_cd import run_mp3_pipeline
 from modes.audio_cd import run_audio_cd_pipeline
+from modes.mp3_cd import run_mp3_pipeline
 
 
 class ConsoleLogger:

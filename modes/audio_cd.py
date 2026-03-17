@@ -1,12 +1,12 @@
 import os
 import subprocess
 
-from core.naming import safe_name
 from core.constants import (
-    AUDIO_CD_SAMPLE_RATE,
     AUDIO_CD_CHANNELS,
     AUDIO_CD_SAMPLE_FORMAT,
+    AUDIO_CD_SAMPLE_RATE,
 )
+from core.naming import safe_name
 
 
 def convert_to_wav(mp3_path, wav_path, stop_flag):
