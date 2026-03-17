@@ -6,6 +6,18 @@
 
 Burning a Spotify playlist to a physical CD requires downloading each track, normalising formats, fitting the collection to disc capacity, applying metadata, and renumbering files. This project automates that pipeline.
 
+## How it works (and why it's free)
+
+You export your Spotify playlist to CSV with [Exportify](https://exportify.net/) (free, no account needed). The app then:
+
+- **Finds each track** on YouTube via `yt-dlp`, using smart search variants (artist + title, with fallbacks for parenthesised titles, multi-artist tracks, etc.) and tries up to 3 candidates per variant.
+- **Validates before downloading**: checks YouTube metadata first. If the duration differs from Spotify’s by more than ±10%, it skips that candidate and tries the next—no wasted downloads.
+- **Validates after downloading**: runs `ffprobe` on each file. If the actual duration still doesn’t match, the file is rejected and deleted. Rejected and failed tracks are written to CSVs so you can review.
+- **Fits to disc**: for MP3 CD mode, starts at 320 kbps and automatically steps down (256→192→160→128) until the collection fits in ~700 MB.
+- **Resumes**: tracks progress in `state.json`; re-run after a stop and it skips already-accepted tracks.
+
+No Spotify API, no paid services, no account friction—just CSV in, CD-ready output out.
+
 ## What it currently does
 
 There are two entry points:
