@@ -6,3 +6,12 @@ version = "0.1.0"
 testpaths = ["tests"]
 norecursedirs = [".git", ".pytest_cache", "manual", "runs"]
 pythonpath = ["."]
+
+[tool.ruff]
+target-version = "py39"
+line-length = 100
+exclude = [".venv", "build", "dist", "__pycache__"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I"]
+ignore = ["E501"]

@@ -6,7 +6,7 @@ are compatible with make_track_key() and get_duration_ms() from core.artists.
 
 import os
 
-from core.artists import make_track_key, get_duration_ms
+from core.artists import get_duration_ms, make_track_key
 from sources.csv_source import load_tracks_from_csv
 
 FIXTURE_DIR = os.path.join(os.path.dirname(__file__), "..", "manual", "input_csv")

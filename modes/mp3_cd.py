@@ -1,14 +1,14 @@
 import os
 import shutil
 
+from core.constants import MP3_BITRATE_LADDER_KBPS, MP3_CD_TARGET_MB
 from core.ffmpeg_utils import (
-    get_total_size,
     convert_to_bitrate,
-    set_metadata,
-    renumber_files,
     estimate_required_bitrate,
+    get_total_size,
+    renumber_files,
+    set_metadata,
 )
-from core.constants import MP3_CD_TARGET_MB, MP3_BITRATE_LADDER_KBPS
 
 
 def process_mp3_folder(folder, log_queue, stop_flag, start_bitrate):

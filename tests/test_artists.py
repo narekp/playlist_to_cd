@@ -1,5 +1,4 @@
 """Tests for core.artists."""
-import pytest
 
 from core.artists import get_duration_ms, make_track_key, split_artists
 

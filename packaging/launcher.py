@@ -55,6 +55,7 @@ if __name__ == "__main__":
     setup_bundled_path()
 
     import tkinter as tk
+
     from main_original import App
 
     root = tk.Tk()

@@ -2,8 +2,8 @@ import os
 import shutil
 import subprocess
 
+from .constants import AUDIO_CD_SAMPLE_RATE, MP3_CD_TARGET_MB
 from .naming import format_artists_for_metadata
-from .constants import MP3_CD_TARGET_MB, AUDIO_CD_SAMPLE_RATE
 
 
 def verify_duration(file_path, expected_ms, stop_flag):

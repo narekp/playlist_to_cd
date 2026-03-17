@@ -113,7 +113,14 @@ The decision is to keep the app centered on a simple user-owned workflow: export
 pip install -r requirements.txt
 ```
 
-(`requirements.txt` currently contains only `pytest>=7.0` for testing.)
+(`requirements.txt` contains `pytest` and `ruff` for testing and linting.)
+
+### Linting
+
+```bash
+ruff check .
+ruff check . --fix   # auto-fix safe issues
+```
 
 ## How to run tests
 
